@@ -9,7 +9,7 @@ interface ChatWindowProps {
   messages: Message[];
   streamingContent: string;
   isStreaming: boolean;
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, imageDataUrl?: string) => void;
   conversationTitle?: string;
 }
 
@@ -84,7 +84,7 @@ export function ChatWindow({
               ].map((suggestion, i) => (
                 <button
                   key={i}
-                  onClick={() => onSendMessage(suggestion.text)}
+                  onClick={() => onSendMessage(suggestion.text, undefined)}
                   className={cn(
                     "suggestion-card flex items-start gap-3 p-4 text-left text-sm rounded-xl",
                     "border bg-card/50 backdrop-blur-sm",
@@ -129,7 +129,7 @@ export function ChatWindow({
 
       {/* Input with subtle backdrop */}
       <div className="bg-background/80 backdrop-blur-sm">
-        <ChatInput onSend={onSendMessage} disabled={isStreaming} />
+        <ChatInput onSend={(msg, img) => onSendMessage(msg, img)} disabled={isStreaming} />
       </div>
     </div>
   );

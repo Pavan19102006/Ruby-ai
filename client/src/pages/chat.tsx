@@ -69,14 +69,15 @@ export default function ChatPage() {
   });
 
   // Send message and stream response
-  const sendMessage = useCallback(async (content: string) => {
+  const sendMessage = useCallback(async (content: string, imageDataUrl?: string) => {
     let conversationId = activeConversationId;
 
     // Create conversation if none exists
     if (!conversationId) {
       try {
+        const titleText = content || "Screenshot analysis";
         const res = await apiRequest("POST", "/api/conversations", {
-          title: content.slice(0, 50) + (content.length > 50 ? "..." : ""),
+          title: titleText.slice(0, 50) + (titleText.length > 50 ? "..." : ""),
         });
         const newConv: Conversation = await res.json();
         conversationId = newConv.id;
@@ -96,10 +97,17 @@ export default function ChatPage() {
     setStreamingContent("");
 
     try {
+      // Build the message content - include image description if present
+      let messageContent = content;
+      if (imageDataUrl) {
+        const imagePrefix = "[Screenshot attached]\n";
+        messageContent = imagePrefix + (content || "Please analyze this screenshot.");
+      }
+
       const response = await fetch(`/api/conversations/${conversationId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content: messageContent, imageDataUrl }),
       });
 
       if (!response.ok) {

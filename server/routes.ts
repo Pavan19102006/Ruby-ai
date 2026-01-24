@@ -18,6 +18,7 @@ const createConversationSchema = z.object({
 
 const sendMessageSchema = z.object({
   content: z.string().min(1, "Message is required").max(10000, "Message too long"),
+  imageDataUrl: z.string().optional(),
 });
 
 export async function registerRoutes(
@@ -99,7 +100,7 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Invalid request", details: result.error.format() });
       }
 
-      const { content } = result.data;
+      const { content, imageDataUrl } = result.data;
 
       // Save user message
       await storage.createMessage(conversationId, "user", content);
@@ -111,13 +112,33 @@ export async function registerRoutes(
       const chatMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
         {
           role: "system",
-          content: `You are Ruby AI, a helpful, friendly, and intelligent assistant. You provide clear, accurate, and thoughtful responses. You have a warm personality and enjoy helping users with their questions and tasks. Be concise but thorough in your answers.`
+          content: `You are Ruby AI, a helpful, friendly, and intelligent assistant. You provide clear, accurate, and thoughtful responses. You have a warm personality and enjoy helping users with their questions and tasks. Be concise but thorough in your answers. When users share screenshots or images, analyze them carefully and provide helpful insights.`
         },
-        ...existingMessages.map((m) => ({
+      ];
+
+      // Add existing messages
+      for (const m of existingMessages.slice(0, -1)) {
+        chatMessages.push({
           role: m.role as "user" | "assistant",
           content: m.content,
-        })),
-      ];
+        });
+      }
+
+      // Add the current message with image if present
+      if (imageDataUrl) {
+        chatMessages.push({
+          role: "user",
+          content: [
+            { type: "text", text: content },
+            { type: "image_url", image_url: { url: imageDataUrl } },
+          ],
+        });
+      } else {
+        chatMessages.push({
+          role: "user",
+          content: content,
+        });
+      }
 
       // Set up SSE
       res.setHeader("Content-Type", "text/event-stream");

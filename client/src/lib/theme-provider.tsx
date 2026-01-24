@@ -24,16 +24,13 @@ function safeLocalStorage(action: 'get' | 'set', key: string, value?: string): s
 }
 
 function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   
   const stored = safeLocalStorage('get', "ruby-ai-theme") as Theme | null;
   if (stored === "light" || stored === "dark") return stored;
   
-  try {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  } catch {
-    return "light";
-  }
+  // Default to dark theme
+  return "dark";
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
