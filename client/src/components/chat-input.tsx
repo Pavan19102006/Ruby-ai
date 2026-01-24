@@ -172,7 +172,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Message Ruby AI..."
           >
             <Send className={cn(
               "h-4 w-4 transition-transform duration-300",
-              hasContent && "translate-x-0.5 -translate-y-0.5"
+              hasContent ? "translate-x-0.5 -translate-y-0.5" : ""
             )} />
           </Button>
         </div>
