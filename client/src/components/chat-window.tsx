@@ -67,7 +67,7 @@ export function ChatWindow({
               </div>
             </div>
 
-            <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text">
+            <h3 className="text-3xl font-bold mb-3 rainbow-text rainbow-glow">
               Welcome to Ruby AI
             </h3>
             <p className="text-muted-foreground text-center max-w-md mb-10 leading-relaxed">
