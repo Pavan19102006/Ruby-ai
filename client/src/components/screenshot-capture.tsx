@@ -1,6 +1,12 @@
 import { useState, useRef } from "react";
-import { Camera, X, Check, Loader2 } from "lucide-react";
+import { Paperclip, X, Check, Loader2, ImagePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 interface ScreenshotCaptureProps {
@@ -11,15 +17,12 @@ interface ScreenshotCaptureProps {
 export function ScreenshotCapture({ onCapture, disabled }: ScreenshotCaptureProps) {
   const [isCapturing, setIsCapturing] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const captureScreen = async () => {
     setIsCapturing(true);
-    setError(null);
     
     try {
-      // Try using the Screen Capture API
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: { displaySurface: "monitor" } as MediaTrackConstraints,
       });
@@ -39,11 +42,8 @@ export function ScreenshotCapture({ onCapture, disabled }: ScreenshotCaptureProp
         setPreview(dataUrl);
       }
       
-      // Stop all tracks
       stream.getTracks().forEach(track => track.stop());
     } catch (err) {
-      // If screen capture fails, fall back to file upload
-      setError("Screen capture not available. Please upload an image instead.");
       fileInputRef.current?.click();
     } finally {
       setIsCapturing(false);
@@ -55,7 +55,6 @@ export function ScreenshotCapture({ onCapture, disabled }: ScreenshotCaptureProp
     if (!file) return;
     
     if (!file.type.startsWith("image/")) {
-      setError("Please select an image file");
       return;
     }
     
@@ -63,9 +62,12 @@ export function ScreenshotCapture({ onCapture, disabled }: ScreenshotCaptureProp
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
       setPreview(dataUrl);
-      setError(null);
     };
     reader.readAsDataURL(file);
+  };
+
+  const openFileDialog = () => {
+    fileInputRef.current?.click();
   };
 
   const confirmCapture = () => {
@@ -77,14 +79,13 @@ export function ScreenshotCapture({ onCapture, disabled }: ScreenshotCaptureProp
 
   const cancelCapture = () => {
     setPreview(null);
-    setError(null);
   };
 
   if (preview) {
     return (
       <div className="flex items-center gap-2">
         <div className="relative h-12 w-20 rounded-lg overflow-hidden border-2 border-primary">
-          <img src={preview} alt="Screenshot preview" className="h-full w-full object-cover" />
+          <img src={preview} alt="Preview" className="h-full w-full object-cover" />
         </div>
         <Button
           type="button"
@@ -92,7 +93,7 @@ export function ScreenshotCapture({ onCapture, disabled }: ScreenshotCaptureProp
           variant="ghost"
           onClick={confirmCapture}
           className="h-8 w-8 text-green-500 hover:text-green-600 hover:bg-green-500/10"
-          data-testid="button-confirm-screenshot"
+          data-testid="button-confirm-attachment"
         >
           <Check className="h-4 w-4" />
         </Button>
@@ -102,7 +103,7 @@ export function ScreenshotCapture({ onCapture, disabled }: ScreenshotCaptureProp
           variant="ghost"
           onClick={cancelCapture}
           className="h-8 w-8 text-destructive hover:text-destructive/80 hover:bg-destructive/10"
-          data-testid="button-cancel-screenshot"
+          data-testid="button-cancel-attachment"
         >
           <X className="h-4 w-4" />
         </Button>
@@ -111,37 +112,48 @@ export function ScreenshotCapture({ onCapture, disabled }: ScreenshotCaptureProp
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center">
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        capture="environment"
         onChange={handleFileUpload}
         className="hidden"
         data-testid="input-file-upload"
       />
-      <Button
-        type="button"
-        size="icon"
-        variant="ghost"
-        onClick={captureScreen}
-        disabled={disabled || isCapturing}
-        className={cn(
-          "shrink-0 transition-all duration-300",
-          isCapturing && "animate-pulse"
-        )}
-        title="Capture screenshot or upload image"
-        data-testid="button-capture-screenshot"
-      >
-        {isCapturing ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Camera className="h-4 w-4" />
-        )}
-      </Button>
-      {error && (
-        <span className="text-xs text-muted-foreground">{error}</span>
-      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            disabled={disabled || isCapturing}
+            className={cn(
+              "shrink-0 transition-all duration-300",
+              isCapturing && "animate-pulse"
+            )}
+            title="Attach image"
+            data-testid="button-attachment"
+          >
+            {isCapturing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Paperclip className="h-4 w-4" />
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-48">
+          <DropdownMenuItem onClick={openFileDialog} data-testid="menu-upload-photo">
+            <ImagePlus className="h-4 w-4 mr-2" />
+            Upload Photo
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={captureScreen} data-testid="menu-capture-screen">
+            <ImagePlus className="h-4 w-4 mr-2" />
+            Capture Screen
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
