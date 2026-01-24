@@ -93,38 +93,32 @@ export function ChatSidebar({
                         animationFillMode: "forwards"
                       }}
                     >
-                      <SidebarMenuButton
-                        onClick={() => onSelect(conv.id)}
-                        isActive={activeId === conv.id}
-                        className="group justify-between gap-2 transition-all duration-200"
-                        data-testid={`button-conversation-${conv.id}`}
-                      >
-                        <div className="flex items-center gap-2.5 overflow-hidden">
+                      <div className="flex items-center gap-1 w-full group">
+                        <SidebarMenuButton
+                          onClick={() => onSelect(conv.id)}
+                          isActive={activeId === conv.id}
+                          className="flex-1 gap-2 transition-all duration-200"
+                          data-testid={`button-conversation-${conv.id}`}
+                        >
                           <MessageSquare className={cn(
                             "h-4 w-4 shrink-0 transition-colors duration-200",
                             activeId === conv.id && "text-primary"
                           )} />
                           <span className="truncate font-medium">{conv.title}</span>
-                        </div>
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          className="h-7 w-7 flex items-center justify-center rounded-md opacity-0 group-hover:opacity-100 shrink-0 hover-elevate cursor-pointer transition-all duration-200 hover:bg-destructive/20 hover:text-destructive"
+                        </SidebarMenuButton>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 shrink-0 opacity-60 hover:opacity-100 hover:bg-destructive/20 hover:text-destructive transition-all duration-200"
                           onClick={(e) => {
                             e.stopPropagation();
                             onDelete(conv.id);
                           }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.stopPropagation();
-                              onDelete(conv.id);
-                            }
-                          }}
                           data-testid={`button-delete-conversation-${conv.id}`}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                        </span>
-                      </SidebarMenuButton>
+                        </Button>
+                      </div>
                     </SidebarMenuItem>
                   ))
                 )}
