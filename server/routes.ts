@@ -146,6 +146,9 @@ export async function registerRoutes(
       res.setHeader("Connection", "keep-alive");
 
       try {
+        // Log for debugging
+        console.log("Sending to AI with image:", !!imageDataUrl);
+        
         // Stream response from AI
         const stream = await openai.chat.completions.create({
           model: "gpt-4o",

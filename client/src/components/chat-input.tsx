@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Send, Sparkles, X, Image } from "lucide-react";
+import { Send, Sparkles, X, Image, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { ScreenshotCapture } from "./screenshot-capture";
+import { useToast } from "@/hooks/use-toast";
 
 const messageSchema = z.object({
   content: z.string().max(10000, "Message too long"),
@@ -22,6 +23,7 @@ interface ChatInputProps {
 
 export function ChatInput({ onSend, disabled, placeholder = "Message Ruby AI..." }: ChatInputProps) {
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
+  const { toast } = useToast();
   
   const form = useForm<MessageFormData>({
     resolver: zodResolver(messageSchema),
@@ -29,6 +31,33 @@ export function ChatInput({ onSend, disabled, placeholder = "Message Ruby AI..."
       content: "",
     },
   });
+
+  // Handle clipboard paste for screenshots (Cmd+V / Ctrl+V)
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const dataUrl = event.target?.result as string;
+            setAttachedImage(dataUrl);
+            toast({
+              title: "Screenshot attached",
+              description: "Your screenshot has been added to the message",
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+        break;
+      }
+    }
+  }, [toast]);
 
   const onSubmit = (data: MessageFormData) => {
     if (!disabled && (data.content.trim() || attachedImage)) {
@@ -111,6 +140,7 @@ export function ChatInput({ onSend, disabled, placeholder = "Message Ruby AI..."
                     <Textarea
                       {...field}
                       onKeyDown={handleKeyDown}
+                      onPaste={handlePaste}
                       placeholder={attachedImage ? "Add a message about the screenshot..." : placeholder}
                       disabled={disabled}
                       rows={1}
