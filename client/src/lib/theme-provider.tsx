@@ -10,21 +10,40 @@ type ThemeProviderContextType = {
 
 const ThemeProviderContext = createContext<ThemeProviderContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("ruby-ai-theme") as Theme;
-      if (stored) return stored;
-      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+function safeLocalStorage(action: 'get' | 'set', key: string, value?: string): string | null {
+  try {
+    if (action === 'get') {
+      return localStorage.getItem(key);
+    } else if (action === 'set' && value !== undefined) {
+      localStorage.setItem(key, value);
     }
+  } catch {
+    // localStorage blocked or unavailable - fail silently
+  }
+  return null;
+}
+
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "light";
+  
+  const stored = safeLocalStorage('get', "ruby-ai-theme") as Theme | null;
+  if (stored === "light" || stored === "dark") return stored;
+  
+  try {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  } catch {
     return "light";
-  });
+  }
+}
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove("light", "dark");
     root.classList.add(theme);
-    localStorage.setItem("ruby-ai-theme", theme);
+    safeLocalStorage('set', "ruby-ai-theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {
