@@ -36,20 +36,20 @@ export function ChatSidebar({
     <Sidebar className="border-r border-sidebar-border">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-3">
-          <div className="ruby-gradient p-2 rounded-md">
-            <Gem className="h-6 w-6 text-white" />
+          <div className="ruby-gradient-animated p-2.5 rounded-xl shadow-lg transition-transform duration-300 hover:scale-105">
+            <Gem className="h-6 w-6 text-white drop-shadow" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-sidebar-foreground">Ruby AI</h1>
-            <p className="text-xs text-sidebar-foreground/70">Your AI Assistant</p>
+            <h1 className="text-lg font-bold text-sidebar-foreground tracking-tight">Ruby AI</h1>
+            <p className="text-xs text-sidebar-foreground/60">Your AI Assistant</p>
           </div>
         </div>
       </SidebarHeader>
 
-      <div className="px-3 pb-3">
+      <div className="px-3 pb-4">
         <Button
           onClick={onCreate}
-          className="w-full justify-start gap-2"
+          className="w-full justify-start gap-2 shadow-sm transition-all duration-300 hover:shadow-md"
           variant="default"
           data-testid="button-new-chat"
         >
@@ -60,37 +60,56 @@ export function ChatSidebar({
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/60">
+          <SidebarGroupLabel className="text-sidebar-foreground/50 text-xs font-medium uppercase tracking-wider px-3">
             Conversations
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <ScrollArea className="h-[calc(100vh-200px)] custom-scrollbar">
-              <SidebarMenu>
+            <ScrollArea className="h-[calc(100vh-220px)] custom-scrollbar">
+              <SidebarMenu className="px-1">
                 {isLoading ? (
-                  <div className="px-3 py-8 text-center text-sm text-sidebar-foreground/50">
-                    Loading...
+                  <div className="px-3 py-8 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-8 w-8 rounded-full border-2 border-sidebar-foreground/20 border-t-primary animate-spin" />
+                      <span className="text-sm text-sidebar-foreground/50">Loading...</span>
+                    </div>
                   </div>
                 ) : conversations.length === 0 ? (
-                  <div className="px-3 py-8 text-center text-sm text-sidebar-foreground/50">
-                    No conversations yet
+                  <div className="px-3 py-12 text-center fade-in">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="p-3 rounded-xl bg-sidebar-accent/30">
+                        <MessageSquare className="h-6 w-6 text-sidebar-foreground/40" />
+                      </div>
+                      <p className="text-sm text-sidebar-foreground/50">No conversations yet</p>
+                      <p className="text-xs text-sidebar-foreground/30">Start a new chat above</p>
+                    </div>
                   </div>
                 ) : (
-                  conversations.map((conv) => (
-                    <SidebarMenuItem key={conv.id}>
+                  conversations.map((conv, index) => (
+                    <SidebarMenuItem 
+                      key={conv.id} 
+                      className="opacity-0 animate-scale-bounce"
+                      style={{ 
+                        animationDelay: `${index * 0.05}s`,
+                        animationFillMode: "forwards"
+                      }}
+                    >
                       <SidebarMenuButton
                         onClick={() => onSelect(conv.id)}
                         isActive={activeId === conv.id}
-                        className="group justify-between gap-2"
+                        className="group justify-between gap-2 transition-all duration-200"
                         data-testid={`button-conversation-${conv.id}`}
                       >
-                        <div className="flex items-center gap-2 overflow-hidden">
-                          <MessageSquare className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{conv.title}</span>
+                        <div className="flex items-center gap-2.5 overflow-hidden">
+                          <MessageSquare className={cn(
+                            "h-4 w-4 shrink-0 transition-colors duration-200",
+                            activeId === conv.id && "text-primary"
+                          )} />
+                          <span className="truncate font-medium">{conv.title}</span>
                         </div>
                         <span
                           role="button"
                           tabIndex={0}
-                          className="h-6 w-6 flex items-center justify-center rounded-md opacity-0 group-hover:opacity-100 shrink-0 hover-elevate cursor-pointer"
+                          className="h-7 w-7 flex items-center justify-center rounded-md opacity-0 group-hover:opacity-100 shrink-0 hover-elevate cursor-pointer transition-all duration-200 hover:bg-destructive/20 hover:text-destructive"
                           onClick={(e) => {
                             e.stopPropagation();
                             onDelete(conv.id);
@@ -103,7 +122,7 @@ export function ChatSidebar({
                           }}
                           data-testid={`button-delete-conversation-${conv.id}`}
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

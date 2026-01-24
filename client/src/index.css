@@ -164,7 +164,9 @@
   }
 }
 
-/* Typing animation for AI responses */
+/* ===== BEAUTIFUL ANIMATIONS ===== */
+
+/* Typing cursor animation */
 @keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
@@ -174,28 +176,193 @@
   content: '|';
   animation: blink 1s infinite;
   color: hsl(var(--primary));
+  font-weight: 300;
 }
 
-/* Smooth message animations */
-@keyframes slideIn {
+/* Message slide in animation */
+@keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 .message-animate {
-  animation: slideIn 0.3s ease-out forwards;
+  animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Ruby gem gradient for branding */
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Floating gem animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(2deg); }
+  50% { transform: translateY(-4px) rotate(0deg); }
+  75% { transform: translateY(-10px) rotate(-2deg); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Pulse glow animation */
+@keyframes pulseGlow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(220, 38, 80, 0.3), 0 0 40px rgba(220, 38, 80, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(220, 38, 80, 0.5), 0 0 60px rgba(220, 38, 80, 0.2);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* Shimmer effect for loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Scale bounce animation */
+@keyframes scaleBounce {
+  0% { transform: scale(0.95); opacity: 0; }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-scale-bounce {
+  animation: scaleBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stagger animation for lists */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+
+/* Spin slow for decorative elements */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 20s linear infinite;
+}
+
+/* Ruby gem gradient with animation */
 .ruby-gradient {
   background: linear-gradient(135deg, hsl(348 83% 47%) 0%, hsl(348 90% 35%) 100%);
+  transition: all 0.3s ease;
 }
+
+.ruby-gradient:hover {
+  background: linear-gradient(135deg, hsl(348 90% 52%) 0%, hsl(348 85% 40%) 100%);
+}
+
+/* Animated ruby gradient */
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.ruby-gradient-animated {
+  background: linear-gradient(
+    135deg,
+    hsl(348 83% 47%) 0%,
+    hsl(348 90% 55%) 25%,
+    hsl(348 80% 40%) 50%,
+    hsl(348 90% 55%) 75%,
+    hsl(348 83% 47%) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradientShift 5s ease-in-out infinite;
+}
+
+/* Message bubble hover effect */
+.message-bubble {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-bubble:hover {
+  transform: translateX(2px);
+}
+
+/* Suggestion card animations */
+.suggestion-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.suggestion-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(220, 38, 80, 0.15);
+}
+
+.suggestion-card:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* Status dot animation */
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+.status-online {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+.status-thinking {
+  width: 8px;
+  height: 8px;
+  background: hsl(var(--primary));
+  border-radius: 50%;
+  animation: statusPulse 0.8s ease-in-out infinite;
+}
+
+/* Thinking dots animation */
+@keyframes thinkingDots {
+  0%, 20% { opacity: 0.3; }
+  50% { opacity: 1; }
+  80%, 100% { opacity: 0.3; }
+}
+
+.thinking-dots span {
+  animation: thinkingDots 1.4s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(1) { animation-delay: 0s; }
+.thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
 
 /* Scrollbar styling */
 .custom-scrollbar::-webkit-scrollbar {
@@ -207,13 +374,38 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
+  background: hsl(var(--muted-foreground) / 0.2);
   border-radius: 3px;
+  transition: background 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: hsl(var(--muted-foreground) / 0.4);
 }
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Decorative background pattern */
+.pattern-dots {
+  background-image: radial-gradient(
+    hsl(var(--muted-foreground) / 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+/* ===== UTILITY ANIMATIONS ===== */
 
 /**
  * Using the elevate system.

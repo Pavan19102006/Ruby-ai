@@ -31,47 +31,76 @@ export function ChatWindow({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b">
-        <div className="ruby-gradient p-1.5 rounded-md">
+      {/* Header with status */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b bg-background/80 backdrop-blur-sm">
+        <div className="ruby-gradient p-2 rounded-lg shadow-sm transition-transform duration-300 hover:scale-105">
           <Gem className="h-4 w-4 text-white" />
         </div>
-        <div>
-          <h2 className="font-medium text-sm">
+        <div className="flex-1">
+          <h2 className="font-semibold text-sm">
             {conversationTitle || "Ruby AI"}
           </h2>
-          <p className="text-xs text-muted-foreground">
-            {isStreaming ? "Thinking..." : "Online"}
-          </p>
+          <div className="flex items-center gap-2">
+            <div className={isStreaming ? "status-thinking" : "status-online"} />
+            <p className="text-xs text-muted-foreground">
+              {isStreaming ? (
+                <span className="thinking-dots">
+                  Thinking<span>.</span><span>.</span><span>.</span>
+                </span>
+              ) : (
+                "Online"
+              )}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-4 custom-scrollbar" ref={scrollRef}>
         {!hasMessages ? (
-          <div className="flex flex-col items-center justify-center h-full py-12">
-            <div className="ruby-gradient p-4 rounded-2xl mb-6">
-              <Gem className="h-12 w-12 text-white" />
+          <div className="flex flex-col items-center justify-center h-full py-12 fade-in">
+            {/* Animated gem icon */}
+            <div className="relative mb-8">
+              <div className="absolute inset-0 ruby-gradient rounded-3xl blur-2xl opacity-30 animate-pulse-glow" />
+              <div className="relative ruby-gradient-animated p-6 rounded-3xl shadow-xl animate-float">
+                <Gem className="h-14 w-14 text-white drop-shadow-lg" />
+              </div>
             </div>
-            <h3 className="text-2xl font-semibold mb-2">Welcome to Ruby AI</h3>
-            <p className="text-muted-foreground text-center max-w-md mb-8">
-              I'm your intelligent assistant, ready to help with questions, ideas, and conversations.
+
+            <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text">
+              Welcome to Ruby AI
+            </h3>
+            <p className="text-muted-foreground text-center max-w-md mb-10 leading-relaxed">
+              I'm your intelligent assistant, ready to help with questions, creative ideas, and thoughtful conversations.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg">
+
+            {/* Suggestion cards with staggered animation */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl w-full">
               {[
-                "Explain quantum computing in simple terms",
-                "Write a poem about the ocean",
-                "Help me plan a weekend trip",
-                "What are some healthy breakfast ideas?",
+                { text: "Explain quantum computing in simple terms", icon: "brain" },
+                { text: "Write a poem about the ocean", icon: "pen" },
+                { text: "Help me plan a weekend trip", icon: "map" },
+                { text: "What are some healthy breakfast ideas?", icon: "leaf" },
               ].map((suggestion, i) => (
                 <button
                   key={i}
-                  onClick={() => onSendMessage(suggestion)}
-                  className="flex items-center gap-2 p-3 text-left text-sm rounded-lg border bg-card hover-elevate transition-colors"
+                  onClick={() => onSendMessage(suggestion.text)}
+                  className={cn(
+                    "suggestion-card flex items-start gap-3 p-4 text-left text-sm rounded-xl",
+                    "border bg-card/50 backdrop-blur-sm",
+                    "opacity-0 animate-scale-bounce",
+                    i === 0 && "stagger-1",
+                    i === 1 && "stagger-2",
+                    i === 2 && "stagger-3",
+                    i === 3 && "stagger-4"
+                  )}
+                  style={{ animationFillMode: "forwards" }}
                   data-testid={`button-suggestion-${i}`}
                 >
-                  <Sparkles className="h-4 w-4 text-primary shrink-0" />
-                  <span className="line-clamp-2">{suggestion}</span>
+                  <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="leading-relaxed text-foreground/80">{suggestion.text}</span>
                 </button>
               ))}
             </div>
@@ -98,8 +127,14 @@ export function ChatWindow({
         )}
       </ScrollArea>
 
-      {/* Input */}
-      <ChatInput onSend={onSendMessage} disabled={isStreaming} />
+      {/* Input with subtle backdrop */}
+      <div className="bg-background/80 backdrop-blur-sm">
+        <ChatInput onSend={onSendMessage} disabled={isStreaming} />
+      </div>
     </div>
   );
+}
+
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(" ");
 }
