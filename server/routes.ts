@@ -2,14 +2,17 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
+import axios from "axios";
 import { z } from "zod";
 
-// Configure OpenAI client with user's API key
-// Uses Replit AI Integrations if user's key isn't set
+// Configure OpenAI client for text-only messages
 const openai = new OpenAI({
   apiKey: process.env.OLLAMA_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
   baseURL: process.env.OLLAMA_BASE_URL || process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
+
+// Ollama API URL for vision (llava model)
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
 
 // Validation schemas
 const createConversationSchema = z.object({
@@ -146,24 +149,81 @@ export async function registerRoutes(
       res.setHeader("Connection", "keep-alive");
 
       try {
-        // Log for debugging
-        console.log("Sending to AI with image:", !!imageDataUrl);
-        
-        // Stream response from AI
-        const stream = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: chatMessages,
-          stream: true,
-          max_tokens: 2048,
-        });
-
         let fullResponse = "";
 
-        for await (const chunk of stream) {
-          const content = chunk.choices[0]?.delta?.content || "";
-          if (content) {
-            fullResponse += content;
-            res.write(`data: ${JSON.stringify({ content })}\n\n`);
+        // Use Ollama llava model for vision when image is present
+        if (imageDataUrl) {
+          console.log("Using Ollama llava model for vision...");
+          
+          // Extract base64 from data URL (remove data:image/...;base64, prefix)
+          const base64Image = imageDataUrl.split(",")[1] || imageDataUrl;
+          
+          // Build prompt with context from previous messages
+          let contextPrompt = "You are Ruby AI, a helpful assistant. ";
+          for (const m of existingMessages.slice(0, -1)) {
+            if (m.role === "user") {
+              contextPrompt += `User asked: ${m.content}. `;
+            }
+          }
+          contextPrompt += `\n\nUser's current request: ${content}`;
+          
+          try {
+            const ollamaResponse = await axios.post(
+              `${OLLAMA_BASE_URL}/api/generate`,
+              {
+                model: "llava",
+                prompt: contextPrompt,
+                images: [base64Image],
+                stream: false,
+              },
+              { timeout: 120000 }
+            );
+            
+            fullResponse = ollamaResponse.data.response || "I couldn't analyze the image. Please try again.";
+            
+            // Send response in chunks for streaming effect
+            const words = fullResponse.split(" ");
+            for (let i = 0; i < words.length; i += 3) {
+              const chunk = words.slice(i, i + 3).join(" ") + " ";
+              res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
+            }
+          } catch (ollamaError: any) {
+            console.error("Ollama Error:", ollamaError?.message || ollamaError);
+            
+            // Fallback to OpenAI if Ollama fails
+            console.log("Falling back to OpenAI for vision...");
+            const stream = await openai.chat.completions.create({
+              model: "gpt-4o",
+              messages: chatMessages,
+              stream: true,
+              max_tokens: 2048,
+            });
+
+            for await (const chunk of stream) {
+              const chunkContent = chunk.choices[0]?.delta?.content || "";
+              if (chunkContent) {
+                fullResponse += chunkContent;
+                res.write(`data: ${JSON.stringify({ content: chunkContent })}\n\n`);
+              }
+            }
+          }
+        } else {
+          // Use OpenAI for text-only messages
+          console.log("Using OpenAI for text message...");
+          
+          const stream = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: chatMessages,
+            stream: true,
+            max_tokens: 2048,
+          });
+
+          for await (const chunk of stream) {
+            const chunkContent = chunk.choices[0]?.delta?.content || "";
+            if (chunkContent) {
+              fullResponse += chunkContent;
+              res.write(`data: ${JSON.stringify({ content: chunkContent })}\n\n`);
+            }
           }
         }
 
@@ -172,8 +232,8 @@ export async function registerRoutes(
 
         res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
         res.end();
-      } catch (aiError) {
-        console.error("AI Error:", aiError);
+      } catch (aiError: any) {
+        console.error("AI Error:", aiError?.message || aiError);
         res.write(`data: ${JSON.stringify({ error: "Failed to get AI response. Please check your API configuration." })}\n\n`);
         res.end();
       }
