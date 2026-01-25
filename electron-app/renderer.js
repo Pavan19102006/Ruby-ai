@@ -1,6 +1,6 @@
 // Ruby AI Desktop - Renderer Script
 
-let serverUrl = 'http://localhost:3000';
+let serverUrl = 'https://ruby-ai.onrender.com';
 let currentConversationId = null;
 let pendingScreenshot = null;
 let isLoading = false;

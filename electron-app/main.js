@@ -8,7 +8,7 @@ let isVisible = false;
 // Server URL - change this if deployed
 // For local: http://localhost:3000
 // For production: https://your-app.onrender.com
-const SERVER_URL = process.env.RUBY_AI_SERVER || 'http://localhost:3000';
+const SERVER_URL = process.env.RUBY_AI_SERVER || 'https://ruby-ai.onrender.com';
 
 function createWindow() {
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
