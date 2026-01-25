@@ -2,17 +2,23 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
-import axios from "axios";
 import { z } from "zod";
 
-// Configure OpenAI client for text-only messages
-const openai = new OpenAI({
-  apiKey: process.env.OLLAMA_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.OLLAMA_BASE_URL || process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+// Groq client for text/thinking (super fast)
+const groq = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
 });
 
-// Ollama API URL for vision (llava model)
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
+// OpenRouter client for vision (many models, good rate limits)
+const openrouter = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
+});
+
+// Model configuration
+const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+const VISION_MODEL = process.env.VISION_MODEL || "google/gemini-2.0-flash-001";
 
 // Validation schemas
 const createConversationSchema = z.object({
@@ -151,71 +157,76 @@ export async function registerRoutes(
       try {
         let fullResponse = "";
 
-        // Use Ollama llava model for vision when image is present
-        if (imageDataUrl) {
-          console.log("Using Ollama llava model for vision...");
-          
-          // Extract base64 from data URL (remove data:image/...;base64, prefix)
-          const base64Image = imageDataUrl.split(",")[1] || imageDataUrl;
-          
-          // Build prompt with context from previous messages
-          let contextPrompt = "You are Ruby AI, a helpful assistant. ";
-          for (const m of existingMessages.slice(0, -1)) {
-            if (m.role === "user") {
-              contextPrompt += `User asked: ${m.content}. `;
-            }
-          }
-          contextPrompt += `\n\nUser's current request: ${content}`;
-          
-          try {
-            const ollamaResponse = await axios.post(
-              `${OLLAMA_BASE_URL}/api/generate`,
-              {
-                model: "llava",
-                prompt: contextPrompt,
-                images: [base64Image],
-                stream: false,
-              },
-              { timeout: 120000 }
-            );
-            
-            fullResponse = ollamaResponse.data.response || "I couldn't analyze the image. Please try again.";
-            
-            // Send response in chunks for streaming effect
-            const words = fullResponse.split(" ");
-            for (let i = 0; i < words.length; i += 3) {
-              const chunk = words.slice(i, i + 3).join(" ") + " ";
-              res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
-            }
-          } catch (ollamaError: any) {
-            console.error("Ollama Error:", ollamaError?.message || ollamaError);
-            
-            // Fallback to OpenAI if Ollama fails
-            console.log("Falling back to OpenAI for vision...");
-            const stream = await openai.chat.completions.create({
-              model: "gpt-4o",
-              messages: chatMessages,
-              stream: true,
-              max_tokens: 2048,
-            });
+        // Check if conversation has any images (current or in history)
+        const hasImageInConversation = imageDataUrl || existingMessages.some(m => 
+          m.content.includes("[Screenshot attached]") || m.content.includes("data:image")
+        );
 
-            for await (const chunk of stream) {
-              const chunkContent = chunk.choices[0]?.delta?.content || "";
-              if (chunkContent) {
-                fullResponse += chunkContent;
-                res.write(`data: ${JSON.stringify({ content: chunkContent })}\n\n`);
-              }
+        // Use Gemini for conversations with images, Groq for text-only
+        if (hasImageInConversation) {
+          console.log("Using OpenRouter for vision...");
+          
+          // Rebuild messages with proper image handling for vision
+          const visionMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+            {
+              role: "system",
+              content: `You are Ruby AI, a helpful, friendly, and intelligent assistant with vision capabilities. You can see and analyze images/screenshots. Provide clear, accurate, and thoughtful responses about what you see. Be concise but thorough.`
+            },
+          ];
+
+          // Add existing messages (keeping image references in context)
+          for (const m of existingMessages.slice(0, -1)) {
+            visionMessages.push({
+              role: m.role as "user" | "assistant",
+              content: m.content,
+            });
+          }
+
+          // Add the current message with image if present
+          if (imageDataUrl) {
+            visionMessages.push({
+              role: "user",
+              content: [
+                { type: "text", text: content },
+                { type: "image_url", image_url: { url: imageDataUrl } },
+              ],
+            });
+          } else {
+            visionMessages.push({
+              role: "user",
+              content: content,
+            });
+          }
+          
+          const stream = await openrouter.chat.completions.create({
+            model: VISION_MODEL,
+            messages: visionMessages,
+            stream: true,
+            max_tokens: 4096,
+          });
+
+          for await (const chunk of stream) {
+            const chunkContent = chunk.choices[0]?.delta?.content || "";
+            if (chunkContent) {
+              fullResponse += chunkContent;
+              res.write(`data: ${JSON.stringify({ content: chunkContent })}\n\n`);
             }
           }
         } else {
-          // Use OpenAI for text-only messages
-          console.log("Using OpenAI for text message...");
+          // Use Groq for text-only conversations (fast thinking)
+          console.log("Using Groq for text message...");
           
-          const stream = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: chatMessages,
+          // Convert messages for Groq (text only)
+          const textMessages = chatMessages.map(m => ({
+            role: m.role as "user" | "assistant" | "system",
+            content: typeof m.content === 'string' ? m.content : m.content.map((c: any) => c.type === 'text' ? c.text : '').join('')
+          }));
+          
+          const stream = await groq.chat.completions.create({
+            model: GROQ_MODEL,
+            messages: textMessages,
             stream: true,
-            max_tokens: 2048,
+            max_tokens: 4096,
           });
 
           for await (const chunk of stream) {

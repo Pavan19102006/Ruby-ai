@@ -4,3 +4,19 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Replit
+.local/
+.neon
+.replit
+replit.nix
+
+# Electron build outputs
+electron-app/node_modules
+electron-app/dist
+electron-app/out
