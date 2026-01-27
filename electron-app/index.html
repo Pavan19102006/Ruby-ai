@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     :root {
       --primary: #e11d48;
       --primary-hover: #be123c;
@@ -21,7 +22,7 @@
       --text-muted: #a1a1aa;
       --border: #27272a;
     }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: transparent;
@@ -30,7 +31,7 @@
       overflow: hidden;
       -webkit-app-region: no-drag;
     }
-    
+
     .container {
       background: var(--bg-dark);
       border-radius: 16px;
@@ -41,7 +42,7 @@
       overflow: hidden;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
-    
+
     /* Header */
     .header {
       padding: 12px 16px;
@@ -53,7 +54,7 @@
       -webkit-app-region: drag;
       border-radius: 16px 16px 0 0;
     }
-    
+
     .logo {
       width: 32px;
       height: 32px;
@@ -65,24 +66,24 @@
       font-size: 16px;
       -webkit-app-region: no-drag;
     }
-    
+
     .header-text h1 {
       font-size: 14px;
       font-weight: 600;
     }
-    
+
     .header-text p {
       font-size: 10px;
       color: var(--text-muted);
     }
-    
+
     .header-actions {
       margin-left: auto;
       display: flex;
       gap: 8px;
       -webkit-app-region: no-drag;
     }
-    
+
     .header-btn {
       background: none;
       border: none;
@@ -92,12 +93,12 @@
       border-radius: 4px;
       font-size: 14px;
     }
-    
+
     .header-btn:hover {
       background: var(--bg-input);
       color: var(--text);
     }
-    
+
     .status {
       display: flex;
       align-items: center;
@@ -107,18 +108,18 @@
       margin-left: auto;
       margin-right: 8px;
     }
-    
+
     .status-dot {
       width: 6px;
       height: 6px;
       background: #22c55e;
       border-radius: 50%;
     }
-    
+
     .status-dot.offline {
       background: #ef4444;
     }
-    
+
     /* Messages area */
     .messages {
       flex: 1;
@@ -128,35 +129,42 @@
       flex-direction: column;
       gap: 12px;
     }
-    
+
     .messages::-webkit-scrollbar {
       width: 6px;
     }
-    
+
     .messages::-webkit-scrollbar-track {
       background: transparent;
     }
-    
+
     .messages::-webkit-scrollbar-thumb {
       background: var(--border);
       border-radius: 3px;
     }
-    
+
     .message {
       display: flex;
       gap: 8px;
       animation: fadeIn 0.2s ease;
     }
-    
+
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    
+
     .message.user {
       flex-direction: row-reverse;
     }
-    
+
     .message-avatar {
       width: 24px;
       height: 24px;
@@ -168,11 +176,11 @@
       font-size: 10px;
       flex-shrink: 0;
     }
-    
+
     .message.assistant .message-avatar {
       background: linear-gradient(135deg, var(--primary), #f43f5e);
     }
-    
+
     .message-content {
       max-width: 85%;
       padding: 8px 12px;
@@ -180,24 +188,136 @@
       font-size: 12px;
       line-height: 1.5;
     }
-    
+
+    .message-content p {
+      margin: 0 0 8px 0;
+    }
+
+    .message-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-content h1,
+    .message-content h2,
+    .message-content h3 {
+      margin: 12px 0 6px 0;
+      font-weight: 600;
+    }
+
+    .message-content h1 {
+      font-size: 16px;
+    }
+
+    .message-content h2 {
+      font-size: 14px;
+    }
+
+    .message-content h3 {
+      font-size: 13px;
+    }
+
+    .message-content ul,
+    .message-content ol {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+
+    .message-content li {
+      margin: 4px 0;
+    }
+
+    .message-content strong {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .message-content em {
+      font-style: italic;
+    }
+
+    .inline-code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+      font-size: 11px;
+    }
+
+    /* Code block styling */
+    .code-block {
+      margin: 10px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #1e1e1e;
+      border: 1px solid #333;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      background: #2d2d2d;
+      border-bottom: 1px solid #333;
+    }
+
+    .code-language {
+      font-size: 10px;
+      color: #888;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      color: #888;
+      font-size: 10px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .code-block pre {
+      margin: 0;
+      padding: 12px;
+      overflow-x: auto;
+    }
+
+    .code-block code {
+      font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #d4d4d4;
+      white-space: pre;
+    }
+
     .message.user .message-content {
       background: var(--primary);
       border-bottom-right-radius: 4px;
     }
-    
+
     .message.assistant .message-content {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-bottom-left-radius: 4px;
     }
-    
+
     .message-image {
       max-width: 150px;
       border-radius: 8px;
       margin-bottom: 6px;
     }
-    
+
     /* Welcome screen */
     .welcome {
       flex: 1;
@@ -208,7 +328,7 @@
       padding: 20px;
       text-align: center;
     }
-    
+
     .welcome-icon {
       width: 50px;
       height: 50px;
@@ -220,18 +340,18 @@
       font-size: 24px;
       margin-bottom: 12px;
     }
-    
+
     .welcome h2 {
       font-size: 16px;
       margin-bottom: 6px;
     }
-    
+
     .welcome p {
       font-size: 11px;
       color: var(--text-muted);
       margin-bottom: 16px;
     }
-    
+
     .shortcuts {
       display: flex;
       flex-direction: column;
@@ -239,13 +359,13 @@
       font-size: 10px;
       color: var(--text-muted);
     }
-    
+
     .shortcut {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    
+
     .shortcut kbd {
       background: var(--bg-input);
       padding: 3px 6px;
@@ -254,7 +374,7 @@
       font-size: 9px;
       border: 1px solid var(--border);
     }
-    
+
     /* Input area */
     .input-area {
       padding: 10px 12px;
@@ -262,7 +382,7 @@
       background: var(--bg-card);
       border-radius: 0 0 16px 16px;
     }
-    
+
     .screenshot-preview {
       display: flex;
       align-items: center;
@@ -273,12 +393,12 @@
       margin-bottom: 8px;
       font-size: 11px;
     }
-    
+
     .screenshot-preview img {
       height: 32px;
       border-radius: 4px;
     }
-    
+
     .screenshot-preview .remove {
       margin-left: auto;
       background: none;
@@ -287,17 +407,18 @@
       cursor: pointer;
       padding: 2px;
     }
-    
+
     .screenshot-preview .remove:hover {
       color: #ef4444;
     }
-    
+
     .input-row {
       display: flex;
       gap: 6px;
+      align-items: flex-end;
     }
-    
-    .input-row input {
+
+    .input-row textarea {
       flex: 1;
       background: var(--bg-input);
       border: 1px solid var(--border);
@@ -306,16 +427,22 @@
       color: var(--text);
       font-size: 12px;
       outline: none;
+      resize: none;
+      min-height: 36px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: inherit;
+      line-height: 1.4;
     }
-    
-    .input-row input:focus {
+
+    .input-row textarea:focus {
       border-color: var(--primary);
     }
-    
-    .input-row input::placeholder {
+
+    .input-row textarea::placeholder {
       color: var(--text-muted);
     }
-    
+
     .btn {
       background: var(--primary);
       border: none;
@@ -330,32 +457,32 @@
       transition: background 0.2s;
       font-size: 12px;
     }
-    
+
     .btn:hover {
       background: var(--primary-hover);
     }
-    
+
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    
+
     .btn-icon {
       background: var(--bg-input);
       border: 1px solid var(--border);
     }
-    
+
     .btn-icon:hover {
       background: var(--border);
     }
-    
+
     /* Loading */
     .loading {
       display: flex;
       gap: 3px;
       padding: 8px 12px;
     }
-    
+
     .loading span {
       width: 5px;
       height: 5px;
@@ -363,17 +490,34 @@
       border-radius: 50%;
       animation: bounce 1.4s ease-in-out infinite;
     }
-    
-    .loading span:nth-child(1) { animation-delay: 0s; }
-    .loading span:nth-child(2) { animation-delay: 0.2s; }
-    .loading span:nth-child(3) { animation-delay: 0.4s; }
-    
+
+    .loading span:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .loading span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
     @keyframes bounce {
-      0%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-6px); }
+
+      0%,
+      80%,
+      100% {
+        transform: translateY(0);
+      }
+
+      40% {
+        transform: translateY(-6px);
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
@@ -391,7 +535,7 @@
         <button class="header-btn" id="hideBtn" title="Hide (Esc)">✕</button>
       </div>
     </div>
-    
+
     <div class="messages" id="messages">
       <div class="welcome" id="welcome">
         <div class="welcome-icon">💎</div>
@@ -413,7 +557,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="input-area">
       <div class="screenshot-preview" id="screenshotPreview" style="display: none;">
         <img id="screenshotImg" src="" alt="Screenshot">
@@ -422,12 +566,13 @@
       </div>
       <div class="input-row">
         <button class="btn btn-icon" id="captureBtn" title="Capture screenshot (⌘⇧S)">📷</button>
-        <input type="text" id="messageInput" placeholder="Ask Ruby AI...">
+        <textarea id="messageInput" placeholder="Ask Ruby AI..." rows="1"></textarea>
         <button class="btn" id="sendBtn" title="Send">➤</button>
       </div>
     </div>
   </div>
-  
+
   <script src="renderer.js"></script>
 </body>
+
 </html>
