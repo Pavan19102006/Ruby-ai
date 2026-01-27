@@ -213,7 +213,9 @@ function addMessage(role, content, imageUrl = null) {
   const messageEl = document.createElement('div');
   messageEl.className = `message ${role}`;
 
-  const avatar = role === 'assistant' ? '💎' : '👤';
+  const avatar = role === 'assistant'
+    ? '<img src="assets/ruby-icon.jpg" alt="Ruby AI">'
+    : '👤';
 
   let imageHtml = '';
   if (imageUrl && role === 'user') {
