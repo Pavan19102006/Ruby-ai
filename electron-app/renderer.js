@@ -258,7 +258,7 @@ function parseMarkdown(text) {
   let processedText = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, language, code) => {
     const index = codeBlocks.length;
     codeBlocks.push({ language: language || 'code', code: code.trim() });
-    return `§§CODEBLOCK${index}§§`;
+    return `%%CODEBLOCK${index}%%`;
   });
 
   // Escape HTML in the remaining text
@@ -315,7 +315,7 @@ function parseMarkdown(text) {
         <pre><code class="language-${block.language}">${escapeHtml(block.code)}</code></pre>
       </div>
     `;
-    processedText = processedText.replace(`§§CODEBLOCK${index}§§`, codeHtml);
+    processedText = processedText.replace(`%%CODEBLOCK${index}%%`, codeHtml);
   });
 
   return processedText;
@@ -352,7 +352,7 @@ function addLoading() {
   const loadingEl = document.createElement('div');
   loadingEl.className = 'message assistant';
   loadingEl.innerHTML = `
-    <div class="message-avatar">💎</div>
+    <div class="message-avatar"><img src="assets/ruby-icon.jpg" alt="Ruby AI"></div>
     <div class="loading">
       <span></span>
       <span></span>
@@ -376,20 +376,10 @@ function resetChat() {
 // Event Listeners
 sendBtn.addEventListener('click', sendMessage);
 
-// Auto-resize textarea as user types
-function autoResize() {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = Math.min(messageInput.scrollHeight, 150) + 'px';
-}
-
-messageInput.addEventListener('input', autoResize);
-
 messageInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
     sendMessage();
-    // Reset height after sending
-    messageInput.style.height = 'auto';
   }
 });
 

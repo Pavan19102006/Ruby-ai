@@ -8,14 +8,14 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   // Conversation methods
   getConversation(id: number): Promise<Conversation | undefined>;
-  getAllConversations(): Promise<Conversation[]>;
-  createConversation(title: string): Promise<Conversation>;
+  getAllConversations(userId: string): Promise<Conversation[]>;
+  createConversation(title: string, userId: string): Promise<Conversation>;
   updateConversationTitle(id: number, title: string): Promise<Conversation | undefined>;
   deleteConversation(id: number): Promise<void>;
-  
+
   // Message methods
   getMessagesByConversation(conversationId: number): Promise<Message[]>;
   createMessage(conversationId: number, role: string, content: string): Promise<Message>;
@@ -44,12 +44,12 @@ export class DatabaseStorage implements IStorage {
     return conversation;
   }
 
-  async getAllConversations(): Promise<Conversation[]> {
-    return db.select().from(conversations).orderBy(desc(conversations.createdAt));
+  async getAllConversations(userId: string): Promise<Conversation[]> {
+    return db.select().from(conversations).where(eq(conversations.userId, userId)).orderBy(desc(conversations.createdAt));
   }
 
-  async createConversation(title: string): Promise<Conversation> {
-    const [conversation] = await db.insert(conversations).values({ title }).returning();
+  async createConversation(title: string, userId: string): Promise<Conversation> {
+    const [conversation] = await db.insert(conversations).values({ title, userId }).returning();
     return conversation;
   }
 

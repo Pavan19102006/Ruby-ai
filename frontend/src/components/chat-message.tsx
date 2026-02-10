@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import ReactMarkdown from "react-markdown";
 import type { Message } from "@shared/schema";
 
 interface ChatMessageProps {
@@ -162,15 +163,44 @@ export function ChatMessage({ message, isStreaming }: ChatMessageProps) {
                 language={part.language || "python"}
               />
             ) : (
-              <p
+              <div
                 key={index}
                 className={cn(
-                  "text-sm leading-relaxed whitespace-pre-wrap",
+                  "text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none",
+                  "prose-p:my-1 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5",
+                  "prose-strong:font-semibold prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs",
+                  "prose-headings:mt-3 prose-headings:mb-1.5",
                   isStreaming && !isUser && index === contentParts.length - 1 && "typing-cursor"
                 )}
               >
-                {part.content}
-              </p>
+                <ReactMarkdown
+                  components={{
+                    // Override code to handle inline code (not code blocks)
+                    code: ({ className, children, ...props }) => {
+                      return (
+                        <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono" {...props}>
+                          {children}
+                        </code>
+                      );
+                    },
+                    // Style paragraphs
+                    p: ({ children }) => <p className="my-1.5">{children}</p>,
+                    // Style lists
+                    ul: ({ children }) => <ul className="list-disc list-inside my-2 space-y-1">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside my-2 space-y-1">{children}</ol>,
+                    li: ({ children }) => <li className="ml-2">{children}</li>,
+                    // Style headings
+                    h1: ({ children }) => <h1 className="text-lg font-bold mt-3 mb-1.5">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-base font-bold mt-2.5 mb-1">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-sm font-bold mt-2 mb-1">{children}</h3>,
+                    // Style bold and italic
+                    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                    em: ({ children }) => <em className="italic">{children}</em>,
+                  }}
+                >
+                  {part.content}
+                </ReactMarkdown>
+              </div>
             )
           ))}
         </div>

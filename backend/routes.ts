@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { requireAuth } from "./auth";
 import OpenAI from "openai";
 import { z } from "zod";
 
@@ -34,11 +35,12 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
-  // Get all conversations
-  app.get("/api/conversations", async (req, res) => {
+
+  // Get all conversations (scoped to logged-in user)
+  app.get("/api/conversations", requireAuth, async (req, res) => {
     try {
-      const conversations = await storage.getAllConversations();
+      const userId = req.user!.id;
+      const conversations = await storage.getAllConversations(userId);
       res.json(conversations);
     } catch (error) {
       console.error("Error fetching conversations:", error);
@@ -46,16 +48,20 @@ export async function registerRoutes(
     }
   });
 
-  // Get single conversation with messages
-  app.get("/api/conversations/:id", async (req, res) => {
+  // Get single conversation with messages (verify ownership)
+  app.get("/api/conversations/:id", requireAuth, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       if (isNaN(id)) {
         return res.status(400).json({ error: "Invalid conversation ID" });
       }
       const conversation = await storage.getConversation(id);
       if (!conversation) {
         return res.status(404).json({ error: "Conversation not found" });
+      }
+      // Verify ownership
+      if (conversation.userId !== req.user!.id) {
+        return res.status(403).json({ error: "Access denied" });
       }
       const messages = await storage.getMessagesByConversation(id);
       res.json({ ...conversation, messages });
@@ -65,15 +71,16 @@ export async function registerRoutes(
     }
   });
 
-  // Create new conversation
-  app.post("/api/conversations", async (req, res) => {
+  // Create new conversation (attached to logged-in user)
+  app.post("/api/conversations", requireAuth, async (req, res) => {
     try {
       const result = createConversationSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({ error: "Invalid request", details: result.error.format() });
       }
-      
-      const conversation = await storage.createConversation(result.data.title);
+
+      const userId = req.user!.id;
+      const conversation = await storage.createConversation(result.data.title, userId);
       res.status(201).json(conversation);
     } catch (error) {
       console.error("Error creating conversation:", error);
@@ -81,12 +88,20 @@ export async function registerRoutes(
     }
   });
 
-  // Delete conversation
-  app.delete("/api/conversations/:id", async (req, res) => {
+  // Delete conversation (verify ownership)
+  app.delete("/api/conversations/:id", requireAuth, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       if (isNaN(id)) {
         return res.status(400).json({ error: "Invalid conversation ID" });
+      }
+      // Verify ownership
+      const conversation = await storage.getConversation(id);
+      if (!conversation) {
+        return res.status(404).json({ error: "Conversation not found" });
+      }
+      if (conversation.userId !== req.user!.id) {
+        return res.status(403).json({ error: "Access denied" });
       }
       await storage.deleteConversation(id);
       res.status(204).send();
@@ -96,14 +111,23 @@ export async function registerRoutes(
     }
   });
 
-  // Send message and get AI response (streaming)
-  app.post("/api/conversations/:id/messages", async (req, res) => {
+  // Send message and get AI response (streaming, verify ownership)
+  app.post("/api/conversations/:id/messages", requireAuth, async (req, res) => {
     try {
-      const conversationId = parseInt(req.params.id);
+      const conversationId = parseInt(req.params.id as string);
       if (isNaN(conversationId)) {
         return res.status(400).json({ error: "Invalid conversation ID" });
       }
-      
+
+      // Verify ownership
+      const conversation = await storage.getConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ error: "Conversation not found" });
+      }
+      if (conversation.userId !== req.user!.id) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
       const result = sendMessageSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({ error: "Invalid request", details: result.error.format() });
@@ -116,7 +140,7 @@ export async function registerRoutes(
 
       // Get conversation history for context
       const existingMessages = await storage.getMessagesByConversation(conversationId);
-      
+
       // Build chat history with system prompt
       const chatMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
         {
@@ -158,14 +182,14 @@ export async function registerRoutes(
         let fullResponse = "";
 
         // Check if conversation has any images (current or in history)
-        const hasImageInConversation = imageDataUrl || existingMessages.some(m => 
-          m.content.includes("[Screenshot attached]") || m.content.includes("data:image")
+        const hasImageInConversation = imageDataUrl || existingMessages.some(m =>
+          m.content?.includes("[Screenshot attached]") || m.content?.includes("data:image")
         );
 
         // Use Gemini for conversations with images, Groq for text-only
         if (hasImageInConversation) {
           console.log("Using OpenRouter for vision...");
-          
+
           // Rebuild messages with proper image handling for vision
           const visionMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
             {
@@ -197,7 +221,7 @@ export async function registerRoutes(
               content: content,
             });
           }
-          
+
           const stream = await openrouter.chat.completions.create({
             model: VISION_MODEL,
             messages: visionMessages,
@@ -215,13 +239,13 @@ export async function registerRoutes(
         } else {
           // Use Groq for text-only conversations (fast thinking)
           console.log("Using Groq for text message...");
-          
+
           // Convert messages for Groq (text only)
           const textMessages = chatMessages.map(m => ({
             role: m.role as "user" | "assistant" | "system",
             content: typeof m.content === 'string' ? m.content : m.content.map((c: any) => c.type === 'text' ? c.text : '').join('')
           }));
-          
+
           const stream = await groq.chat.completions.create({
             model: GROQ_MODEL,
             messages: textMessages,

@@ -1,6 +1,6 @@
 {
   "name": "ruby-ai-desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ruby AI - Floating AI Assistant",
   "main": "main.js",
   "scripts": {
@@ -18,7 +18,24 @@
       "icon": "assets/icon.icns"
     },
     "win": {
-      "icon": "assets/icon.ico"
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Ruby AI",
+      "allowElevation": true,
+      "runAfterFinish": true
     },
     "linux": {
       "icon": "assets/icon.png"

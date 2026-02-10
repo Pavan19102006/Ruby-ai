@@ -1,7 +1,8 @@
-import { Plus, MessageSquare, Trash2, Gem } from "lucide-react";
+import { Plus, MessageSquare, Trash2, Gem, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +13,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import type { Conversation } from "@shared/schema";
 
@@ -32,6 +34,8 @@ export function ChatSidebar({
   onDelete,
   isLoading,
 }: ChatSidebarProps) {
+  const { user, logout } = useAuth();
+
   return (
     <Sidebar className="border-r border-sidebar-border">
       <SidebarHeader className="p-4">
@@ -64,7 +68,7 @@ export function ChatSidebar({
             Conversations
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <ScrollArea className="h-[calc(100vh-220px)] custom-scrollbar">
+            <ScrollArea className="h-[calc(100vh-300px)] custom-scrollbar">
               <SidebarMenu className="px-1">
                 {isLoading ? (
                   <div className="px-3 py-8 text-center">
@@ -85,10 +89,10 @@ export function ChatSidebar({
                   </div>
                 ) : (
                   conversations.map((conv, index) => (
-                    <SidebarMenuItem 
-                      key={conv.id} 
+                    <SidebarMenuItem
+                      key={conv.id}
                       className="opacity-0 animate-scale-bounce"
-                      style={{ 
+                      style={{
                         animationDelay: `${index * 0.05}s`,
                         animationFillMode: "forwards"
                       }}
@@ -127,6 +131,31 @@ export function ChatSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* User info & Logout */}
+      <SidebarFooter className="p-3 border-t border-sidebar-border">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="p-1.5 rounded-lg bg-sidebar-accent/50 shrink-0">
+              <User className="h-4 w-4 text-sidebar-foreground/70" />
+            </div>
+            <span className="text-sm font-medium text-sidebar-foreground/80 truncate">
+              {user?.username}
+            </span>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={logout}
+            className="h-8 w-8 shrink-0 text-sidebar-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
+            title="Sign out"
+            data-testid="button-logout"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }
+
