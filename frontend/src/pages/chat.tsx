@@ -147,7 +147,7 @@ export default function ChatPage() {
               setStreamingContent(fullContent);
             }
             if (data.done) {
-              queryClient.invalidateQueries({ queryKey: ["/api/conversations", conversationId] });
+              await queryClient.invalidateQueries({ queryKey: ["/api/conversations", conversationId] });
             }
             if (data.error) {
               throw new Error(data.error);
@@ -171,7 +171,7 @@ export default function ChatPage() {
               setStreamingContent(fullContent);
             }
             if (data.done) {
-              queryClient.invalidateQueries({ queryKey: ["/api/conversations", conversationId] });
+              await queryClient.invalidateQueries({ queryKey: ["/api/conversations", conversationId] });
             }
           } catch (_) { /* ignore final partial line */ }
         }
