@@ -13,3 +13,9 @@ if (!process.env.DATABASE_URL) {
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle(pool, { schema });
+
+// Auto-migrate: Add full_name column to users table if it doesn't exist
+// This ensures the database schema matches our code without needing to run drizzle-kit manually
+pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name text;').catch(err => {
+  console.log("Auto-migration note:", err.message);
+});
