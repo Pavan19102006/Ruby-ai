@@ -7,7 +7,6 @@ import type { Message } from "@shared/schema";
 
 interface ChatWindowProps {
   messages: Message[];
-  streamingContent: string;
   isStreaming: boolean;
   onSendMessage: (content: string, imageDataUrl?: string) => void;
   conversationTitle?: string;
@@ -15,7 +14,6 @@ interface ChatWindowProps {
 
 export function ChatWindow({
   messages,
-  streamingContent,
   isStreaming,
   onSendMessage,
   conversationTitle,
@@ -25,9 +23,9 @@ export function ChatWindow({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamingContent]);
+  }, [messages, isStreaming]);
 
-  const hasMessages = messages.length > 0 || streamingContent;
+  const hasMessages = messages.length > 0;
 
   return (
     <div className="flex flex-col h-full">
@@ -107,21 +105,13 @@ export function ChatWindow({
           </div>
         ) : (
           <div className="space-y-6">
-            {messages.map((msg) => (
-              <ChatMessage key={msg.id} message={msg} />
-            ))}
-            {streamingContent && (
-              <ChatMessage
-                message={{
-                  id: -1,
-                  conversationId: -1,
-                  role: "assistant",
-                  content: streamingContent,
-                  createdAt: new Date(),
-                }}
-                isStreaming={true}
+            {messages.map((msg, index) => (
+              <ChatMessage 
+                key={index} 
+                message={msg} 
+                isStreaming={isStreaming && index === messages.length - 1 && msg.role === 'assistant'} 
               />
-            )}
+            ))}
             <div ref={messagesEndRef} />
           </div>
         )}

@@ -14,7 +14,6 @@ interface ConversationWithMessages extends Conversation {
 
 export default function ChatPage() {
   const [activeConversationId, setActiveConversationId] = useState<number | null>(null);
-  const [streamingContent, setStreamingContent] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const { toast } = useToast();
 
@@ -93,9 +92,6 @@ export default function ChatPage() {
       }
     }
 
-    setIsStreaming(true);
-    setStreamingContent("");
-
     try {
       // Build the message content - include image description if present
       let messageContent = content;
@@ -103,6 +99,35 @@ export default function ChatPage() {
         const imagePrefix = "[Screenshot attached]\n";
         messageContent = imagePrefix + (content || "Please analyze this screenshot.");
       }
+
+      // Optimistically add user message and blank AI message to UI instantly
+      const tempUserId = Date.now();
+      const tempAiId = Date.now() + 1;
+      queryClient.setQueryData(["/api/conversations", conversationId], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          messages: [
+            ...old.messages,
+            {
+              id: tempUserId,
+              conversationId,
+              role: "user",
+              content: messageContent,
+              createdAt: new Date().toISOString(),
+            },
+            {
+              id: tempAiId,
+              conversationId,
+              role: "assistant",
+              content: "",
+              createdAt: new Date().toISOString(),
+            }
+          ]
+        };
+      });
+
+      setIsStreaming(true);
 
       const response = await fetch(`/api/conversations/${conversationId}/messages`, {
         method: "POST",
@@ -144,7 +169,15 @@ export default function ChatPage() {
             const data = JSON.parse(payload);
             if (data.content) {
               fullContent += data.content;
-              setStreamingContent(fullContent);
+              queryClient.setQueryData(["/api/conversations", conversationId], (old: any) => {
+                if (!old) return old;
+                return {
+                  ...old,
+                  messages: old.messages.map((m: any) => 
+                    m.id === tempAiId ? { ...m, content: fullContent } : m
+                  )
+                };
+              });
             }
             if (data.done) {
               await queryClient.invalidateQueries({ queryKey: ["/api/conversations", conversationId] });
@@ -168,7 +201,15 @@ export default function ChatPage() {
             const data = JSON.parse(payload);
             if (data.content) {
               fullContent += data.content;
-              setStreamingContent(fullContent);
+              queryClient.setQueryData(["/api/conversations", conversationId], (old: any) => {
+                if (!old) return old;
+                return {
+                  ...old,
+                  messages: old.messages.map((m: any) => 
+                    m.id === tempAiId ? { ...m, content: fullContent } : m
+                  )
+                };
+              });
             }
             if (data.done) {
               await queryClient.invalidateQueries({ queryKey: ["/api/conversations", conversationId] });
@@ -184,7 +225,6 @@ export default function ChatPage() {
       });
     } finally {
       setIsStreaming(false);
-      setStreamingContent("");
     }
   }, [activeConversationId, toast]);
 
@@ -212,7 +252,6 @@ export default function ChatPage() {
           <main className="flex-1 overflow-hidden">
             <ChatWindow
               messages={activeConversation?.messages || []}
-              streamingContent={streamingContent}
               isStreaming={isStreaming}
               onSendMessage={sendMessage}
               conversationTitle={activeConversation?.title}
