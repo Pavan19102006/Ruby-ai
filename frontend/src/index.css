@@ -1,0 +1,657 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* LIGHT MODE - Ruby Red Theme */
+:root {
+  --button-outline: rgba(0, 0, 0, .10);
+  --badge-outline: rgba(0, 0, 0, .05);
+
+  /* Automatic computation of border around primary / danger buttons */
+  --opaque-button-border-intensity: -8;
+  /* In terms of percentages */
+
+  /* Backgrounds applied on top of other backgrounds when hovered/active */
+  --elevate-1: rgba(0, 0, 0, .03);
+  --elevate-2: rgba(0, 0, 0, .08);
+
+  --background: 0 0% 98%;
+  --foreground: 0 0% 12%;
+  --border: 0 0% 88%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 12%;
+  --card-border: 0 0% 90%;
+
+  --sidebar: 348 83% 15%;
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-border: 348 70% 20%;
+  --sidebar-primary: 348 83% 47%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 348 70% 25%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-ring: 348 83% 47%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 12%;
+  --popover-border: 0 0% 90%;
+
+  --primary: 348 83% 47%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 94%;
+  --secondary-foreground: 0 0% 20%;
+
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 45%;
+
+  --accent: 348 60% 94%;
+  --accent-foreground: 348 83% 35%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --input: 0 0% 82%;
+  --ring: 348 83% 47%;
+  --chart-1: 348 83% 47%;
+  --chart-2: 348 70% 60%;
+  --chart-3: 348 50% 70%;
+  --chart-4: 348 40% 80%;
+  --chart-5: 348 30% 90%;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: .5rem;
+  --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.03);
+  --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0px 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0px 6px 10px -2px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0px 20px 25px -5px rgba(0, 0, 0, 0.15);
+  --shadow-2xl: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+
+  /* Pre-computed border colors (lightness adjusted by -8%) */
+  --sidebar-primary-border: hsl(348, 83%, 39%);
+  --sidebar-accent-border: hsl(348, 70%, 17%);
+  --primary-border: hsl(348, 83%, 39%);
+  --secondary-border: hsl(0, 0%, 86%);
+  --muted-border: hsl(0, 0%, 86%);
+  --accent-border: hsl(348, 60%, 86%);
+  --destructive-border: hsl(0, 84%, 52%);
+}
+
+.dark {
+  --button-outline: rgba(255, 255, 255, .10);
+  --badge-outline: rgba(255, 255, 255, .05);
+
+  --opaque-button-border-intensity: 9;
+
+  /* Backgrounds applied on top of other backgrounds when hovered/active */
+  --elevate-1: rgba(255, 255, 255, .04);
+  --elevate-2: rgba(255, 255, 255, .09);
+
+  --background: 0 0% 7%;
+  --foreground: 0 0% 95%;
+  --border: 0 0% 18%;
+
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 95%;
+  --card-border: 0 0% 16%;
+
+  --sidebar: 348 75% 8%;
+  --sidebar-foreground: 0 0% 95%;
+  --sidebar-border: 348 60% 15%;
+  --sidebar-primary: 348 83% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 348 60% 18%;
+  --sidebar-accent-foreground: 0 0% 95%;
+  --sidebar-ring: 348 83% 55%;
+
+  --popover: 0 0% 10%;
+  --popover-foreground: 0 0% 95%;
+  --popover-border: 0 0% 18%;
+
+  --primary: 348 83% 55%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 90%;
+
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 55%;
+
+  --accent: 348 50% 15%;
+  --accent-foreground: 348 83% 70%;
+
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+
+  --input: 0 0% 22%;
+  --ring: 348 83% 55%;
+  --chart-1: 348 83% 55%;
+  --chart-2: 348 70% 45%;
+  --chart-3: 348 60% 35%;
+  --chart-4: 348 50% 25%;
+  --chart-5: 348 40% 18%;
+
+  --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.20);
+  --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0px 2px 4px -1px rgba(0, 0, 0, 0.30);
+  --shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0px 6px 10px -2px rgba(0, 0, 0, 0.40);
+  --shadow-lg: 0px 10px 15px -3px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0px 20px 25px -5px rgba(0, 0, 0, 0.50);
+  --shadow-2xl: 0px 25px 50px -12px rgba(0, 0, 0, 0.60);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* ===== BEAUTIFUL ANIMATIONS ===== */
+
+/* Typing cursor animation */
+@keyframes blink {
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.typing-cursor::after {
+  content: '|';
+  animation: blink 1s infinite;
+  color: hsl(348, 83%, 47%);
+  font-weight: 300;
+}
+
+/* Message slide in animation */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.message-animate {
+  animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Floating gem animation */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+
+  50% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+
+  75% {
+    transform: translateY(-10px) rotate(-2deg);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Pulse glow animation */
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(220, 38, 80, 0.3), 0 0 40px rgba(220, 38, 80, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(220, 38, 80, 0.5), 0 0 60px rgba(220, 38, 80, 0.2);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* Shimmer effect for loading */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg,
+      hsl(0, 0%, 94%) 0%,
+      rgba(115, 115, 115, 0.1) 50%,
+      hsl(0, 0%, 94%) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Scale bounce animation */
+@keyframes scaleBounce {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-bounce {
+  animation: scaleBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stagger animation for lists */
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.2s;
+}
+
+/* Spin slow for decorative elements */
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 20s linear infinite;
+}
+
+/* Ruby gem gradient with animation */
+.ruby-gradient {
+  background: linear-gradient(135deg, hsl(348, 83%, 47%) 0%, hsl(348, 90%, 35%) 100%);
+  transition: all 0.3s ease;
+}
+
+.ruby-gradient:hover {
+  background: linear-gradient(135deg, hsl(348, 90%, 52%) 0%, hsl(348, 85%, 40%) 100%);
+}
+
+/* Animated ruby gradient */
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Rainbow text animation */
+@keyframes rainbow {
+  0% {
+    color: #ff0000;
+  }
+
+  14% {
+    color: #ff7f00;
+  }
+
+  28% {
+    color: #ffff00;
+  }
+
+  42% {
+    color: #00ff00;
+  }
+
+  57% {
+    color: #0000ff;
+  }
+
+  71% {
+    color: #4b0082;
+  }
+
+  85% {
+    color: #9400d3;
+  }
+
+  100% {
+    color: #ff0000;
+  }
+}
+
+@keyframes rainbowGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.rainbow-text {
+  background: linear-gradient(90deg,
+      #ff0000,
+      #ff7f00,
+      #ffff00,
+      #00ff00,
+      #0000ff,
+      #4b0082,
+      #9400d3,
+      #ff0000);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbowGradient 3s linear infinite;
+}
+
+.rainbow-glow {
+  text-shadow:
+    0 0 10px rgba(255, 0, 0, 0.5),
+    0 0 20px rgba(255, 127, 0, 0.4),
+    0 0 30px rgba(255, 255, 0, 0.3),
+    0 0 40px rgba(0, 255, 0, 0.2);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+.ruby-gradient-animated {
+  background: linear-gradient(135deg,
+      hsl(348, 83%, 47%) 0%,
+      hsl(348, 90%, 55%) 25%,
+      hsl(348, 80%, 40%) 50%,
+      hsl(348, 90%, 55%) 75%,
+      hsl(348, 83%, 47%) 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 5s ease-in-out infinite;
+}
+
+/* Message bubble hover effect */
+.message-bubble {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-bubble:hover {
+  transform: translateX(2px);
+}
+
+/* Suggestion card animations */
+.suggestion-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.suggestion-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(220, 38, 80, 0.15);
+}
+
+.suggestion-card:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* Status dot animation */
+@keyframes statusPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+.status-online {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+.status-thinking {
+  width: 8px;
+  height: 8px;
+  background: hsl(348, 83%, 47%);
+  border-radius: 50%;
+  animation: statusPulse 0.8s ease-in-out infinite;
+}
+
+/* Thinking dots animation */
+@keyframes thinkingDots {
+
+  0%,
+  20% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  80%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+.thinking-dots span {
+  animation: thinkingDots 1.4s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.thinking-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.thinking-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Scrollbar styling */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(115, 115, 115, 0.2);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(115, 115, 115, 0.4);
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Decorative background pattern */
+.pattern-dots {
+  background-image: radial-gradient(rgba(115, 115, 115, 0.1) 1px,
+      transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ===== UTILITY ANIMATIONS ===== */
+
+/**
+ * Using the elevate system.
+ */
+@layer utilities {
+
+  /* Hide ugly search cancel button in Chrome until we can style it properly */
+  input[type="search"]::-webkit-search-cancel-button {
+    @apply hidden;
+  }
+
+  /* Placeholder styling for contentEditable div */
+  [contenteditable][data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: hsl(0, 0%, 45%);
+    pointer-events: none;
+  }
+
+  .no-default-hover-elevate {}
+
+  .no-default-active-elevate {}
+
+  .toggle-elevate::before,
+  .toggle-elevate-2::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: -1;
+  }
+
+  .toggle-elevate.toggle-elevated::before {
+    background-color: var(--elevate-2);
+  }
+
+  .border.toggle-elevate::before {
+    inset: -1px;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate),
+  .active-elevate:not(.no-default-active-elevate),
+  .hover-elevate-2:not(.no-default-hover-elevate),
+  .active-elevate-2:not(.no-default-active-elevate) {
+    position: relative;
+    z-index: 0;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate)::after,
+  .active-elevate:not(.no-default-active-elevate)::after,
+  .hover-elevate-2:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:not(.no-default-active-elevate)::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: 999;
+  }
+
+  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-1);
+  }
+
+  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-2);
+  }
+
+  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate:not(.no-active-interaction-elevate)::after,
+  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
+  .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
+    inset: -1px;
+  }
+}
